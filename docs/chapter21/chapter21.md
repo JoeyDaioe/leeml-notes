@@ -4,57 +4,57 @@
 ## 为什么用CNN
 ![](res/chapter21-2.png)
 
-我们都知道CNN常常被用在影像处理上，如果你今天用CNN来做影像处理，当然也可以用一般的neural network来做影像处理，不一定要用CNN。比如说你想要做影像的分类，那么你就是training一个neural network,input一张图片，那么你就把这张图片表示成里面的pixel，也就是很长很长的vector。output就是(假如你有1000个类别，output就是1000个dimension)dimension。那我相信根据刚才那堂课内容，若给你一组training data你都可以描作出来。
+我们都知道CNN常常被用在影像处理上，如果你今天用CNN来做影像处理，当然也可以用一般的neuron network来做影像处理，不一定要用CNN。比如说你想要做影像的分类，那么你就是training一个neuron network,input是一张图片，那么你就把这张图片表示成里面的pixel，也就是很长很长的vector。output就是dimension(假如你有1000个类别，output就是1000个dimension)。那我相信根据刚才那堂课内容，若给你一组training data你都可以秒做出来。
 
 ![](res/chapter21-3.png)
 
-但是呢，我们现在会遇到的问题是这样的，实际上我们在training neural network时，我们会期待说：在network的structure里面，每一个neural就是代表了一个最基本的classifier，事实在文件上根据训练的结果，你有可能会得到很多这样的结论。举例来说：第一层的neural是最简单的classifier，它做的事情就是detain有没有绿色出现，有没有黄色出现，有没有斜的条纹。
+但是呢，我们现在会遇到的问题是这样的，实际上我们在training neuron network时，我们会期待说：在network的structure里面，每一个neuron其实代表了一个最基本的classifier，事实在文献上呢，根据训练的结果，也有很多人得到这样的结论。举例来说：第一层的neuron是最简单的classifier，它做的事情就是detect有没有绿色出现，有没有黄色出现，有没有斜的条纹。
 
-第二个layer是做比这个更复杂的东西，根据第一个layer的output，它看到直线横线就是窗框的一部分，看到棕色纹就是木纹，看到斜条纹+灰色可能是很多的东西(轮胎的一部分等等)
+第二个layer是做比这个更复杂的东西，根据第一个layer的output，它看到直线横线就是窗框的一部分，看到棕色的直条纹就是木纹，看到斜条纹+灰色的，这个可能是很多的东西(比如说轮胎的一部分等等)
 
-再根据第二个hidden layer的outpost，第三个hidden layer会做更加复杂的事情。
+再根据第二个hidden layer的outpot，第三个hidden layer会做更加复杂的事情。比如说，他可以知道说，某一个neuron看到蜂巢，他就被activate。某一个neuron看到车子，就被activate，某一个neuron看到人的上半身，就被activate。
 
-但现在的问题是这样的，当我们一般直接用fully connect feedforward network来做影像处理的时候，往往我们会需要太多的参数，举例来说，假设这是一张100 *100的彩色图(一张很小的imgage)，你把这个拉成一个vector，(它有多少个pixel)，它有100 *100 3的pixel。
-如果是彩色图的话，每个pixel需要三个value来描述它，就是30000维(30000 dimension)，那input vector假如是30000dimension，那这个hidden layer假设是1000个neural，那么这个hidden layer的参数就是有30000 *1000，那这样就太多了。那么CNN做的事就是简化neural network的架构。我们把这里面一些根据人的知识，我们根据我们对影像就知道，某些weight用不上的，我们一开始就把它滤掉。不是用fully connect feedforward network，而是用比较少的参数来做影像处理这件事。所以CNN比一般的DNN还要简单的。
+那现在的问题是这样的，当我们直接用一般的fully connected 的 feedforward network来做影像处理的时候，往往我们会需要太多的参数，举例来说，假设这是一张100 *100的彩色图(它解析度才100x100，那这已经是一张很小的image了)，你把这个拉成一个vector，(它有多少个pixel)，它有100 x100x3的pixel。
+如果是彩色图的话，每个pixel需要三个value来描述它，就是30000维(30000 dimension)，那input vector假如是30000dimension，那这个hidden layer假设是1000个neuron，那么这个hidden layer的参数就是有30000 *1000，那这样就太多了。那么CNN做的事就是简化neuron network的架构。我们把这里面一些根据人的知识，我们根据我们对影像处理的理解，就知道说，某些weight其实是用不上的，我们一开始就把它滤掉。我们一开始就像一些办法，不要用fully connect feedforward network，而是用比较少的参数来做影像处理这件事。所以CNN比一般的DNN还要简单的。
 
-等一下我们讲完会觉得发现说：你可能觉得CNN运作很复杂，但事实上它的模型是要比DNN还要更简单的。我们就是用power-knowledge 去把原来fully connect layer中一些参数拿掉就成了CNN。
+等一下我们讲完会你就会发现说：你可能觉得CNN看起来他的运作很复杂，它应该是个比较复杂的东西，但事实上它的模型是要比DNN还要更简单的。我们就是用prior knowledge 去把原来fully connected layer中一些参数拿掉就成了CNN。
 
 ### Small region
 
 ![](res/chapter21-4.png)
 
-我们先来讲一下，为什么我们有可能把一些参数拿掉(为什么可以用比较少的参数可以来做影像处理这件事情)
+我们先讲一下，为什么我们有可能把一些参数拿掉(为什么我们有可能只用用比较少的参数就可以来做影像处理这件事情)
 
-这里有几个观察，第一个是在影像处理里面，我们说第一层的 hidden layer那些neural要做的事就是侦测某一种pattern，有没有某一种patter出现。大部分的pattern其实要比整张的image还要小，对一个neural来说，假设它要知道一个image里面有没有某一个pattern出现，它其实是不需要看整张image，它只要看image的一小部分。
+那这里有几个观察，第一个是在影像处理里面，如果我们说第一层的 hidden layer，那些neuron要做的事就是侦测某一种pattern，有没有某一种pattern出现。大部分的pattern其实要比整张的image还要小，对一个neuron来说，假设它要知道一个image里面有没有某一个pattern出现，它其实是不需要看整张image，它只要看image的一小部分，他就可以决定这件事情了。
 
-举例来说，假设我们现在有一张图片，第一个hidden layer的某一种neural的工作就是要侦测有没有鸟嘴的存在(有一些neural侦测有没有爪子的存在，有没有一些neural侦测有没有翅膀的存在，有没有尾巴的存在，合起来就可以侦测图片中某一只鸟)。假设有一个neural的工作是要侦测有没有鸟嘴的存在，那并不需要看整张图，其实我们只需要给neural看着一小红色方框的区域(鸟嘴)，它其实就可以知道说，它是不是一个鸟嘴。对人来说也是一样，看这一小块区域这是鸟嘴，不需要去看整张图才知道这件事情。所以，每一个neural连接到每一个小块的区域就好了，不需要连接到整张完整的图。
+举例来说，假设我们现在有一张图片，第一个hidden layer的某一个neuron，它的工作就是要侦测有没有鸟嘴的存在(有一些neuron侦测有没有鸟嘴的存在，有一些neuron侦测有没有爪子的存在，有一些neuron侦测有没有翅膀的存在，有没有尾巴的存在，合起来就可以侦测图片中某一只鸟)。假设有一个neuron的工作是要侦测有没有鸟嘴的存在，那它其实并不需要看整张图。因为，其实我们只需要给neuron看这一个小的部分，这个小的红色方框里面的区域(鸟嘴)，它其实就可以知道说，它是不是一个鸟嘴。对人来说也是一样，只要看这个小的区域你就会知道这是鸟嘴，不需要去看整张图才知道这件事情。所以，每一个neuron只要连接到每一个小块的区域就好了，不需要连接到整张完整的图。
 
 ### Same Patterns
 
 ![](res/chapter21-5.png)
 
-第二个观察是这样子，同样的pattern在image里面，可能会出现在image不同的部分，但是代表的是同样的含义，它们有同样的形状，可以用同样的neural，同样的参数就可以把patter侦测出来。
+第二个观察是这样子，同样的pattern在image里面，可能会出现在image不同的部分，但是它们代表的是同样的含义，它们也有同样的形状，它们可以用同样的neuron，同样的参数。detector就可以侦测出来。
 
-比如说，这张图里面有一张在左上角的鸟嘴，在这张图里面有一个在中央的鸟嘴，但是你并不需要说：我们不需要去训练两个不同的detector，一个专门去侦测左上角的鸟嘴，一个去侦测中央有没有鸟嘴。如果这样做的话，这样就太冗了。我们不需要太多的冗源，这个nerual侦测左上角的鸟嘴跟侦测中央有没有鸟嘴做的事情是一样的。我们并不需要两个neural去做两组参数，我们就要求这两个neural用同一组参数，就样就可以减少你需要参数的量
+比如说，这张图里面有一张在左上角的鸟嘴，在这张图里面有一个在中央的鸟嘴，但是你并不需要说：我们不需要去训练两个不同的detector，一个专门去侦测左上角的鸟嘴，一个去侦测中央有没有鸟嘴。如果这样做的话，这样就太冗了。所以我们要cost down。所以，它不需要太多的冗源，这个侦测左上角鸟嘴的neuron，跟侦测中央有没有鸟嘴的neuron，做的事情是一样的。我们并不需要两个neuron，两组参数，来做duplicate(译：复制、重复)的事情。我们就要求这两个neuron用同一组参数(它们就share它们的参数，它们就共用同一组参数)，就样就可以减少你需要的参数的量。
 
 ### Subsampling
 ![](res/chapter21-6.png)
 
-第三个是：我们知道一个image你可以做subsampling，你把一个image的奇数行，偶数列的pixel拿掉，变成原来十分之一的大小，它其实不会影响人对这张image的理解。对你来说：这张image跟这张image看起来可能没有太大的差别。是没有太大的影响的，所以我们就可以用这样的概念把image变小，这样就可以减少你需要的参数。
+第三个是：我们知道一个image，你可以对它做subsampling，你把一个image的奇数行，偶数列的pixel拿掉，变成原来四分之一的大小，它其实不会影响人对这张image的理解。对你来说：这张image(左侧)跟这张image(右侧)看起来可能没有太大差别。你都可以辨认里面有什么物件，所以做subsampling这件事情，对影像辨识来说，可能是没有太大的影响的，所以我们就可以用这个概念把image变小，这样就可以减少你需要用的参数。
 
 ## CNN架构
 
 ![](res/chapter21-7.png)
 
-所以整个CNN的架构是这样的，首先input一张image以后，这张image会通过convolution layer，接下里做max pooling这件事，然后在做convolution，再做max pooling这件事。这个process可以反复无数次，反复的次数你觉得够多之后，(但是反复多少次你是要事先决定的，它就是network的架构(就像你的neural有几层一样)，你要做几层的convolution，做几层的Max Pooling，你再定neural架构的时候，你要事先决定好)。你做完决定要做的convolution和Max Pooling以后，你要做另外一件事，这件事情叫做flatten，再把flatten的output丢到一般fully connected feedforward network，然后得到影像辨识的结果。
+所以整个CNN的架构是这样的，下面我们会一个一个解释，在CNN的整个架构里面，每一个block它做的事情是什么：首先input一张image以后，这张image会通过convolution layer，接下来做max pooling这件事，然后再做convolution，再做max pooling这件事。这个process可以反复数次，反复的次数你觉得够多之后，(但是反复几次你是要事先决定的，它就是network的架构，就像network有几层一样)，你要做几次convolution，做几次Max Pooling，你在定network架构的时候，你要事先决定好)。你做完你决定要做的convolution和Max Pooling次数以后，你要做另外一件事，这件事情叫做flatten，做完flatten以后，再把flatten的output丢到一般fully connected feedforward network里面去，然后得到影像辨识的结果。
 
 ![](res/chapter21-8.png)
 
-我们刚才讲基于三个对影像处理的观察，所以设计了CNN这样的架构。
+我们刚才讲说，这个我们基于三个对影像处理的观察，所以设计了CNN这样的架构。
 
-第一个观察是，要生成一个pattern，不要看整张的image，你只需要看image的一小部分。第二是，通用的pattern会出现在一张图片的不同的区域。第三个是，我们可以做subsampling
+第一个观察是，要侦测一个pattern，不要看整张的image，你只需要看image的一小部分。第二是，同样的pattern会出现在一张图片的不同的区域。第三个是，我们可以做subsampling。
 
-前面的两个property可以用convolution来处理掉，最后的property可以用Max Pooling这件事来处理。等一下我们要介绍每一个layer再做的事情，我们就先从convolution开始看起。
+前面这两个property可以用convolution来处理掉，最后的property可以用Max Pooling这件事来处理。等一下我们要介绍每一个layer在做的事情，我们就先从convolution开始看起。
 
 ## Convolution
 
@@ -62,39 +62,37 @@
 
 ![](res/chapter21-9.png)
 
-假设现在我们的network的input是一张6*6的Image，如果是黑白的，一个pixel就只需要用一个value去描述它，1就代表有涂墨水，0就代表没有涂到墨水。那在convolution layer里面，它由一组的filter，(其中每一个filter其实就等同于是fully connect layer里面的一个neuron)，每一个filter其实就是一个matrix(3 *3)，这每个filter里面的参数(matrix里面每一个element值)就是network的parameter(这些parameter是要学习出来的，并不是需要人去设计的)
+假设现在我们的network的input是一张6*6的Image，如果是黑白的，一个pixel就只需要用一个value去描述它，1就代表有涂墨水，0就代表没有涂到墨水。那在convolution layer里面，它有一组的filter，它有一堆filter(其中每一个filter其实就等同于是fully connected layer里面的一个neuron)，每一个filter其实就是一个matrix(3 *3)，这每个filter里面的参数(matrix里面每一个element值)就是network的parameter(它就跟那些neuron的weight与bias一样，他们是network的parameter。这些parameter是必须要根据training data学习出来的，并不是人去设计的)。所以每一个filter，它里面的值是做什么，它里面的值是什么，要做什么事情，也是自动被学出来的。
 
-每个filter如果是3* 3的detects意味着它就是再侦测一个3 *3的pattern(看3 *3的一个范围)。在侦测pattern的时候不看整张image，只看一个3 *3的范围内就可以决定有没有某一个pattern的出现。这个就是我们考虑的第一个Property
+我们每一个filter，如果是3* 3的size，意味着它就是在侦测一个3 *3的pattern(它在侦测一个pattern的时候，它不看整张image，它只看一个3 *3的范围内，就可以决定有没有某一个pattern的出现)。这个就是我们考虑的第一个Property，整个pattern其实比整张image还要小。
 
 
 ### Propetry2
 
 ![](res/chapter21-10.png)
 
-这个filter咋样跟这个image运作呢？首先第一个filter是一个3* 3的matrix，把这个filter放在image的左上角，把filter的9个值和image的9个值做内积，两边都是1,1,1(斜对角)，内积的结果就得到3。(移动多少是事先决定的)，移动的距离叫做stride(stride等于多少，自己来设计)，内积等于-1。stride等于2，内积等于-3。我们先设stride等于1。
+这个filter怎么跟这个image做operation呢？这个operation的process是这样，首先你有第一个filter，它是一个3* 3的matrix，你把这个filter放在image的左上角，把filter的9个值和image的9个值做内积，两边都是1,1,1(斜对角)，内积的结果就得到3。挪动一下filter的位置，那至于要移动多少是事先决定好的，移动的距离叫做stride(stride等于多少，自己来设计)，假如设stride = 1，那filter就放在这边(上图中第二个红框)，内积等于-1。设stride等于2，内积等于-3。在下述操作中吗，我们先设stride等于1。
 
 
 ![](res/chapter21-11.png)
 
-你把filter往右移动一格得到-1，再往右移一格得到-3，再往右移动一格得到-1。接下里往下移动一格，得到-3。以此类推(每次都移动一格)，直到你把filter移到右下角的时候，得到-1(得到的值如图所示)
+设stride等于1，你把filter再往右移动一格得到-1，再往右移一格得到-3，再往右移动一格得到-1。接下里往下移动一格，得到-3。以此类推(每次stride=1，都移动一格)，直到你把filter移到右下角的时候，得到-1(得到的值如图所示)
 
-经过这件事情以后，本来是6 *6的matrix，经过convolution process就得到4 *4的matrix。如果你看filter的值，斜对角的值是1,1,1。所以它的工作就是detain1有没有1,1,1(连续左上到右下的出现在这个image里面)。比如说：出现在这里(如图所示蓝色的直线)，所以这个filter就会告诉你：左上跟左下出现最大的值
+经过这件事情以后，本来是6 *6的matrix，经过convolution process就得到4 *4的matrix。如果你看filter的值，斜对角的值是1,1,1。所以它的工作就是detect有没有1,1,1(连续左上到右下的1,1,1出现在这个image里面)。比如说：出现在这里(如图所示蓝色的直线)，所以这个filter就会告诉你：左上跟左下出现最大的值。
 
-
-
-就代表说这个filter要侦测的pattern，出现在这张image的左上角和左下角，这件事情就考虑了propetry2。同一个pattern出现在了左上角的位置跟左下角的位置，我们就可以用filter 1侦测出来，并不需要不同的filter来做这件事。
+就代表说这个filter要侦测的pattern，出现在这张image的左上角和左下角，所以左上角跟左下角有最到的值。这件事情就考虑了propetry2。同一个pattern出现在了左上角的位置跟左下角的位置，我们就可以用filter 1侦测出来，并不需要不同的filter来做这件事，用同样的filter就可以侦测出来。
 
 
 ![](res/chapter21-12.png)
 
-在一个convolution layer 里面会有很多的filter(刚才只是一个filter的结果)，那另外的filter会有不同的参数(图中显示的filter2)，它也做跟filter1一模一样的事情，在filter放到左上角再内积得到结果-1，依次类推。你把filter2跟 input image做完convolution之后，你就得到了另一个4*4的matrix，红色4 *4的matrix跟蓝色的matrix合起来就叫做feature map，看你有几个filter，你就得到多少个image(你有100个filter，你就得到100个4 *4的image)
+在一个convolution layer 里面会有很多的filter(刚才只是一个filter的结果)，那另外的filter会有不同的参数(图中显示的filter2)，它也做跟filter1一模一样的事情，在filter放到左上角再内积得到结果-1，再移动一格，得到-1。就这样，依次类推。你把filter2跟 input image做完convolution之后，你就得到了另一个4*4的matrix，红色4 *4的matrix跟蓝色的matrix合起来就叫做feature map，看你有几个filter，你就得到多少个image(你有100个filter，你就得到100个4 *4的image)
 
 
 ![](res/chapter21-13.png)
 
- 刚才举的例子是一张黑白的image，所以input是一个matrix。若今天换成彩色的image,彩色的image是由RGB组成的，所以，一个彩色的image就是好几个matrix叠在一起，就是一个立方体。如果要处理彩色image，这时候filter不是一个matrix，filter而是一个立方体。如果今天是RGB表示一个pixel的话，那input就是3*6 *6，那filter就是3 *3 *3。
- 
- 在做convolution的话，就是将filter的9个值和image的9个值做内积(不是把每一个channel分开来算，而是合在一起来算，一个filter就考虑了不同颜色所代表的channel)
+ 刚才举的例子是一张黑白的image，所以input是一个matrix。若今天换成彩色的image会怎么样呢？彩色的image是由RGB组成的，所以一个彩色的image就是好几个matrix叠在一起，就是一个立方体。如果要处理彩色image，我们要怎么做呢？这时候filter就不是一个matrix，而是一个立方体。如果是RGB表示一个pixel的话，那input就是3*6 *6，那filter就是3 *3 *3。
+
+ 在做convolution的时候，就是将filter的9个值和image的9个值做内积(并不是把每一个channel分开来算，而是合在一起来算，一个filter就考虑了不同颜色所代表的channel)
 
 
 
@@ -102,21 +100,21 @@
 
 ![](res/chapter21-14.png)
 
-convolution就是fully connected layer把一些weight拿掉了。经过convolution的output其实就是一个hidden layer的neural的output。如果把这两个link在一起的话，convolution就是fully connected拿掉一些weight的结果。
+convolution和fully connected layer关系： convolution就是fully connected layer把一些weight拿掉了。经过convolution的output其实就是一个hidden layer的neuron的output。如果把这两个link在一起的话，convolution就是fully connected layer拿掉一些weight的结果。
 
 ![](res/chapter21-15.png)
 
-我们在做convolution的时候，我们filter1放到左上角(先考虑filter1)，然后做inner product，得到内积为3，这件事情就等同于把6* 6的image拉直(变成如图所示)。然后你有一个neural的output是3，这个neural的output考虑了9个pixel，这9个pixel分别就是编号(1,2,3,7,8,9,13,14,15)的pixel。这个filter做inner product以后的output 3就是某个neuron output 3时，就代表这个neuron的weight只连接到(1,2,3,7,8,9,13,14,15)。这9个weight就是filter matrix里面的9个weight(同样的颜色)
+我们在做convolution的时候，我们filter1放到左上角(先考虑filter1)，然后做inner product，得到内积为3，这件事情就等同于把6* 6的image拉直(变成如图所示)。然后你有一个neuron的output是3，那这个neuron的output怎么来的呢？这个neuron的output考虑了9个pixel(你看这个fillter，它把它放在左上角，所以这个filter它考虑的pixel是1,2,3,7,8,9,13,14,15这九个pixel)。即假如你把这一个6*6的image的36个pixel拉成直的，那这九个pixel分别是编号1,2,3的pixel和7,8,9的pixel，以及13,14,15的pixel。那如果我们说这个filter做inner product以后的output 3就是某个neuron的output 3的话，就代表这个neuron的weight只连接到(1,2,3,7,8,9,13,14,15)。这9个weight就是filter matrix里面的9个weight(同样的颜色，1是棕色的，2是红色的，3是橙色的...共9个不同的颜色)。
 
-在fully connected中，一个neural应该是连接在所有的input(有36个pixel当做input，这个neuron应连接在36个input上)，但是现在只连接了9个input(detain一个pattern，不需要看整张image，看9个input就好)，这样做就是用了比较少的参数了。
+在fully connected的layer里面的一个neuron，照理说是连接到所有的input(有36个pixel当做input，那这个neuron本来应该连接到36个input)，但是，现在只连接了9个input(因为我们知道要detect一个pattern，不需要看整张image，看9个input就好)，这样做就是用了比较少的参数了。
 
 
 
 ![](res/chapter21-16.png)
 
-将stride=1(移动一格)做内积得到另外一个值-1，假设这个-1是另外一个neural的output，这个neural连接到input的(2,3,4，8,9,10,14，15,16)，同样的weight代表同样的颜色。在9个matrix
+当stride=1时，把filter移动一格，会发生什么？做内积得到另外一个值-1，假设这个-1是另外一个neuron的output，这个neuron连接到哪些input的weight呢？Pixel编号(2,3,4,8,9,10,14,15,16)，同样的weight代表同样的颜色。在9个在这个filter所对应的matrix里面的weight就是这个图上9个不同的颜色。
 
-当我们做这件事情就意味说：这两个neuron本来就在fully connect里面这两个neural本来是有自己的weight，当我们在做convolution时，首先把每一个neural连接的wight减少，强迫这两个neural共用一个weight。这件事就叫做shared weight，当我们做这件事情的时候，我们用的这个参数就比原来的更少。
+所以，当我们做这件事情就意味说：这两个neuron本来就在fully connected layer里面，每个neuron都有独立、自己的weight。但是，当我们做convolution的时候，首先把每一个neuron连接的wight减少，强迫某些neuron，(在本例是上述这两个neuron)共用一个weight(他们的weight永远都必须是一样的：第一neuron连接到pixel 1的weight等于第二个neuron连接到pixel 2的weight，第一个neuron连接到pixel2 的weight等于第二个neuron连接到pixel3的weight，第一个neuron连接到pixel3的weight要等于第二个neuron连接到pixel 4的weight)。这件事就叫做shared weight(weight 的 sharing)，当我们做这件事情的时候，我们用的这个参数就比原来的又更少。(我们强迫一些weight一定要share在一起，我们用的weight就更少)。
 
 
 
@@ -126,16 +124,16 @@ convolution就是fully connected layer把一些weight拿掉了。经过convoluti
 
 ![](res/chapter21-18.png)
 
-相对于convolution来说，Max Pooling是比较简单的。我们根据filter 1得到4*4的maxtrix，根据filter2得到另一个4 *4的matrix，接下来把output ，4个一组。每一组里面可以选择它们的平均或者选最大的都可以，就是把四个value合成一个value。这个可以让你的image缩小。
+相对于convolution来说，Max Pooling是比较简单的。我们根据filter 1得到4*4的maxtrix，根据filter2得到另一个4 *4的matrix，接下来把output ，4个一组。每一组里面可以选择它们的平均或者选最大的都可以，就是把四个value合成一个value(你可以用自己想用的方法来做这件事情)。这件事情就可以让你的image缩小。
 
 ![](res/chapter21-19.png)
 
-假设我们选择四个里面的max vlaue保留下来，这样可能会有个问题，把这个放到neuron里面，这样就不能够微分了，但是可以用微分的办法来处理的
+假设我们选择四个里面的最大的那个保留下来，所以3,-1,3,1，我就选3(选最大的那个保留下来)。这样可能会有个问题，把这个放到network里面，不就没办法微分了吗？max这个东西，感觉不能微分啊。它其实可以的，讲Maxout network的时候，再详述。但是其实是可以用微分的办法来处理它的。
 
 
 ![](res/chapter21-20.png)
 
-做完一个convolution和一次max pooling，就将原来6 * 6的image变成了一个2 *2的image。这个2 *2的pixel的深度depend你有几个filter(你有50个filter你就有50维)，得到结果就是一个new image but smaller，一个filter就代表了一个channel。
+结论是这样，做完一个convolution和一次max pooling，就将原来6 * 6的image变成了一个2 *2的image。这个2 *2的image，它的每一个pixel的深度(每个pixel用几个value来表示)depend on你有几个filter(你有50个filter，这边就有50维，两个filter，这边就是二维)所以，得到结果就是一个新的，但是比较小的image，每一个filter就代表了一个channel。
 
 
 
@@ -164,7 +162,7 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-23.png)
 
-唯一要改的是：network structure和input format，本来在DNN中input是一个vector，现在是CNN的话，会考虑 input image的几何空间的，所以不能给它一个vector。应该input一个tensor(高维的vector)。为什么要给三维的vector？因为image的长宽高各是一维，若是彩色的话就是第三维。所以要给三维的tensor
+怎么用Keras来implement CNN：在training，compile和fitting的部分，其实是一模一样的。唯一要改的是：network structure和input的format，本来在DNN中input是一个vector，现在是CNN的话，会考虑 input image的几何空间的，所以不能给它一个vector。应该input一个tensor(高维的vector)。为什么要给三维的vector？因为image的长宽高各是一维，若是彩色的话就是第三维。所以要给三维的tensor
 
 **model.add(Convolution2D**( **25, 3, 3**)
 
@@ -174,7 +172,7 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 **Input_shape=(28,28,1)**
 
-假设我要做手写数字辨识，input是28 *28的image，每个pixel都是单一颜色。所以input_shape是(1,28,28)。如果是黑白图为1(blacj/white)，如果是彩色的图时为3(每个pixel用三个值来表述)。
+假设我要做手写数字辨识，input是28 *28的image，每个pixel都是单一颜色。所以input_shape是(1,28,28)。如果是黑白图为1(blacj/white)，如果是彩色的图时为3(每个pixel用三个值来表示)。
 
 
 
@@ -186,9 +184,9 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-24.png)
 
-假设我们input一个1 *28 * 28的image，你就可以写model.add(Convolution2D( 25, 3, 3, Input_shape=(28,28,1)))。通过convplution以后得到output是25 *26 26(25个filter，通过3 *3得到26 * 26)。然后做max pooling，2 *2一组选择 max value得到 25 *13 * 13
+假设我们input一个1 *28 * 28的image，你就可以写model.add(Convolution2D( 25, 3, 3, Input_shape=(28,28,1)))。通过convplution以后得到output是25 *26 * 26(25个filter，通过3 *3得到26 * 26)。然后做max pooling，2 *2一组选择 max value得到 25 *13 * 13
 
-然后在做一次convolution，假设我在这选50个filter，每一个filter是3 *3时，那么现在的channel就是50。13 *13的image通过3 *3的filter，就成11 *11，然后通过2 *2的Max Pooling，变成了50 *5 *5
+然后再做一次convolution，假设我在这选50个filter，每一个filter是3 *3时，那么现在的channel就是50。13 *13的image通过3 *3的filter，就成11 *11，然后通过2 *2的Max Pooling，变成了50 *5 *5
 
 
 
@@ -202,9 +200,9 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 ## CNN学到了什么?
 ![](res/chapter21-26.png)
 
-很多人常会说：deep learning就是一个黑盒子，然后你learn以后你不知道它得到了什么，所以有很多人不喜欢用这种方法。但还有很多的方法分析的，比如说我们今天来示范一下咋样分析CNN，它到底学到了什么。
+很多人常会说：deep learning就是一个黑盒子，然后你learn以后你不知道它得到了什么，所以有很多人不喜欢用这种方法。但如果有一个方法会让你轻易地理解，它为什么会这样判断，为什么这样决策的话，那其实这个方法，你就会觉得它不投intelligent，因为你可以轻易地理解它。那今天如果它非常intelligent的话，它就必须要是你无法理解的东西。这样，它才够intelligent，至少你会感觉它够intelligent，所以大家常说deep learning就是一个黑盒子，你learn出来以后，你根本不知道为什么是这样子。但是，其实还有很多的方法可以分析的，比如说我们今天来示范一下怎么分析CNN，它到底学到了什么。
 
-分析input第一个filter是比较容易的，因为一个layer每一个filter就是一个3*3的mmatrix，对应到3 *3的范围内的9个pixel。所以你只要看到这个filter的值就可以知道说：它在detain什么东西，所以第一层的filter是很容易理解的，但是你没有办法想要它在做什么事情的是第二层的filter。在第二层我们也是3 *3的filter有50个，但是这些filter的input并不是pixel(3 *3的9个input不是pixel)。而是做完convolution再做Max Pooling的结果。所以这个3 *3的filter就算你把它的weight拿出来，你也不知道它在做什么。另外这个3 *3的filter它考虑的范围并不是3 *3的pixel(9个pixel)，而是比9个pxiel更大的范围。不要这3 *3的element的 input是做完convolution再加Max Pooling的结果。所以它实际上在image上看到的范围，是比3 *3还要更大的。那我们咋样来分析一个filter做的事情是什么呢，以下是一个方法。
+分析第一个input layer的filter是比较容易的，因为一个layer每一个filter就是一个3*3的matrix，它对应到3 *3的范围内的9个pixel。所以你只要看到这个filter的值就可以知道说：它在detect什么东西，所以第一层的filter是很容易理解的，但是你比较没有办法想象它在做什么事情的，是第二层的filter。在第二层我们也是3 *3的filter有50个，但是这些filter的input并不是pixel(3 *3的9个input不是pixel)。而是做完convolution再做Max Pooling的结果。所以这个3 *3的filter就算你把它的weight拿出来，你也不知道它在做什么。另外这个3 *3的filter它考虑的范围并不是3 *3的pixel(9个pixel)，而是比9个pxiel更大的范围。不要这3 *3的element的 input是做完convolution再加Max Pooling的结果。所以它实际上在image上看到的范围，是比3 *3还要更大的。那我们咋样来分析一个filter做的事情是什么呢，以下是一个方法。
 
 
 我们知道现在做第二个convolution layer里面的50个filter，每一个filter的output就是一个matrix(11*11的matrix)。假设我们现在把第k个filter拿出来，它可能是这样子的(如图)，每一个element我们就叫做`$a_{ij}^k$`(上标是说这是第k个filter，i,j代表在这个matrix里面的第i row和第j column)。
@@ -216,7 +214,7 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 假设input一张image，我们称之为X，那我们现在要解的问题就是：找一个x，它可以让我们现在定义的activation Degree `$a^k$`最大，这件事情要咋样做到呢？其实是用gradient ascent你就可以做到这件事(minimize使用gradient descent，maximize使用gradient ascent)
 
-这是事还是蛮神妙的，我们现在是把X当做我们要找的参数用gradient ascent做update，原来在train CNN network neural的时候，input是固定的，model的参数是你需要用gradient descent找出来的，用gradient descent找参数可以让loss被 minimize。但是现在立场是反过来的，现在在这个task里面，model的参数是固定的，我们要让gradient descent 去update这个X，可以让这个activation function的Degree of the activation是最大的。
+这是事还是蛮神妙的，我们现在是把X当做我们要找的参数用gradient ascent做update，原来在train CNN network neuron的时候，input是固定的，model的参数是你需要用gradient descent找出来的，用gradient descent找参数可以让loss被 minimize。但是现在立场是反过来的，现在在这个task里面，model的参数是固定的，我们要让gradient descent 去update这个X，可以让这个activation function的Degree of the activation是最大的。
 
 
 
@@ -235,16 +233,16 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-28.png)
 
-在做完convolution和Max Pooling以后，要做一件事情叫做flatten，把flatten的结果丢到neural network里面去。那我们想要知道：在这个neural network里面，每一个neural的工作是什么。
+在做完convolution和Max Pooling以后，要做一件事情叫做flatten，把flatten的结果丢到neuron network里面去。那我们想要知道：在这个neuron network里面，每一个neuron的工作是什么。
 
-我们要做的事情是这样的：定义第j个neural，它的output叫做`$a_j$`。接下来我们要做事情就是：找一张image(用gradient ascent的方法找一张X)，这个image X你把它丢到neural network里面去，它可以让`$a_j$`的值被maximize。找到的结果就是这样的(如图)
+我们要做的事情是这样的：定义第j个neuron，它的output叫做`$a_j$`。接下来我们要做事情就是：找一张image(用gradient ascent的方法找一张X)，这个image X你把它丢到neuron network里面去，它可以让`$a_j$`的值被maximize。找到的结果就是这样的(如图)
 
-如图是随便取前9个neural出来，什么样的图丢到CNN里面可以让这9个neural最被active output的值最大，就是这9张图(如图)
-
-
+如图是随便取前9个neuron出来，什么样的图丢到CNN里面可以让这9个neuron最被active output的值最大，就是这9张图(如图)
 
 
-这些图跟刚才所观察到图不太一样，在刚在的filter观察到的是类似纹路的图案，在整张图上反复这样的纹路，那是因为每个filter考虑是图上一个小小的range(图上一部分range)。现在每一个neural，在你做flatten以后，每个neural的工作就是去看整张图，而不是是去看图的一小部分。
+
+
+这些图跟刚才所观察到图不太一样，在刚在的filter观察到的是类似纹路的图案，在整张图上反复这样的纹路，那是因为每个filter考虑是图上一个小小的range(图上一部分range)。现在每一个neuron，在你做flatten以后，每个neuron的工作就是去看整张图，而不是是去看图的一小部分。
 
 
 ![](res/chapter21-29.png)
@@ -408,5 +406,4 @@ CNN也可以用在其它的task里面，比如说：CNN也用在影像处理上�
 ![](res/chapter21-43.png)
 
 如果你想要用Degree的方法来让machine自动产生一个digit，这件事是不太成功的，但是有很多其它的方法，可以让machine画出非常清晰的图。这里列了几个方法，比如说：PixelRNN，VAE，GAN来給参考.
-
 
