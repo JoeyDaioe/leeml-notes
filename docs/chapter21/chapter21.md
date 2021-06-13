@@ -172,7 +172,7 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 **Input_shape=(28,28,1)**
 
-假设我要做手写数字辨识，input是28 *28的image，每个pixel都是单一颜色。所以input_shape是(1,28,28)。如果是黑白图为1(blacj/white)，如果是彩色的图时为3(每个pixel用三个值来表示)。
+假设我要做手写数字辨识，input是28 *28的image，每个pixel都是单一颜色。所以input_shape是(1,28,28)。如果是黑白图为1(blacj/white)，如果是彩色的图时为3(每个pixel用三个值来表示 )。
 
 
 
@@ -189,7 +189,6 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 然后再做一次convolution，假设我在这选50个filter，每一个filter是3 *3时，那么现在的channel就是50。13 *13的image通过3 *3的filter，就成11 *11，然后通过2 *2的Max Pooling，变成了50 *5 *5
 
 
-
 在第一个convolution layer里面，每一个filter有9个参数，在第二个convolution layer里面，虽然每一个filter都是3 *3，但不是3 *3个参数，因为它input channel 是25个，所以它的参数是3 *3 *25(225)。
 
 ![](res/chapter21-25.png)
@@ -200,21 +199,21 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 ## CNN学到了什么?
 ![](res/chapter21-26.png)
 
-很多人常会说：deep learning就是一个黑盒子，然后你learn以后你不知道它得到了什么，所以有很多人不喜欢用这种方法。但如果有一个方法会让你轻易地理解，它为什么会这样判断，为什么这样决策的话，那其实这个方法，你就会觉得它不投intelligent，因为你可以轻易地理解它。那今天如果它非常intelligent的话，它就必须要是你无法理解的东西。这样，它才够intelligent，至少你会感觉它够intelligent，所以大家常说deep learning就是一个黑盒子，你learn出来以后，你根本不知道为什么是这样子。但是，其实还有很多的方法可以分析的，比如说我们今天来示范一下怎么分析CNN，它到底学到了什么。
+很多人常会说：deep learning就是一个黑盒子，然后你learn完以后你不知道它得到了什么，所以有很多人不喜欢用这种方法。但如果有一个方法会让你轻易地理解，它为什么会这样判断，为什么这样决策的话，那其实这个方法，你就会觉得它不够intelligent，因为你可以轻易地理解它。那今天如果它非常intelligent的话，它就必须要是你无法理解的东西。这样，它才够intelligent，至少你会感觉它够intelligent，所以大家常说deep learning就是一个黑盒子，你learn出来以后，你根本不知道为什么是这样子。但是，其实还有很多的方法可以分析的，比如说我们今天来示范一下怎么分析CNN，它到底学到了什么。
 
-分析第一个input layer的filter是比较容易的，因为一个layer每一个filter就是一个3*3的matrix，它对应到3 *3的范围内的9个pixel。所以你只要看到这个filter的值就可以知道说：它在detect什么东西，所以第一层的filter是很容易理解的，但是你比较没有办法想象它在做什么事情的，是第二层的filter。在第二层我们也是3 *3的filter有50个，但是这些filter的input并不是pixel(3 *3的9个input不是pixel)。而是做完convolution再做Max Pooling的结果。所以这个3 *3的filter就算你把它的weight拿出来，你也不知道它在做什么。另外这个3 *3的filter它考虑的范围并不是3 *3的pixel(9个pixel)，而是比9个pxiel更大的范围。不要这3 *3的element的 input是做完convolution再加Max Pooling的结果。所以它实际上在image上看到的范围，是比3 *3还要更大的。那我们咋样来分析一个filter做的事情是什么呢，以下是一个方法。
-
-
-我们知道现在做第二个convolution layer里面的50个filter，每一个filter的output就是一个matrix(11*11的matrix)。假设我们现在把第k个filter拿出来，它可能是这样子的(如图)，每一个element我们就叫做`$a_{ij}^k$`(上标是说这是第k个filter，i,j代表在这个matrix里面的第i row和第j column)。
-
-接下来我们定义一个东西叫做："Degree of the activation of the k-th filter"，我们定义一个值代表说：现在第k个filter有多被active(现在的input跟第k个filter有多match)，第k个filter被启动的Degree定义成：这个11*11的 matrix里面全部的 element的summation。(input一张image，然后看这个filter output的这个11 *11的值全部加起来，当做是这个filter被active的程度)
+分析第一个input layer的filter是比较容易的，因为一个layer每一个filter就是一个3*3的matrix，它对应到3 *3的范围内的9个pixel。所以你只要看到这个filter的值就可以知道说：它在detect什么东西，所以第一层的filter是很容易理解的，但是你比较没有办法想象它在做什么事情的，是第二层的filter。在第二层我们也是3 *3的filter有50个，但是这些filter的input并不是pixel(3 *3的9个input不是pixel)。而是做完convolution再做Max Pooling的结果。所以这个3 *3的filter就算你把它的weight拿出来，你也不知道它在做什么。另外这个3 *3的filter它考虑的范围并不是3 *3的pixel(9个pixel)，而是比9个pxiel更大的范围。不要忘了它的input，这3 *3的element的 input是做完convolution再加Max Pooling的结果。所以它实际上在image上看到的范围，是比3 *3还要更大的。那我们怎么来分析一个filter做的事情是什么呢，以下是一个方法。
 
 
-截下来我们要做的事情是这样子的：我们想知道第k个filter的作用是什么，所以我们想要找一张image，这张image它可以让第k个filter被active的程度最大。
+我们知道现在第二个convolution layer里面的50个filter，每一个filter的output就是一个matrix(11*11的matrix)。假设我们现在把第k个filter拿出来，它可能是这样子的(如上图)，每一个element我们就叫做`$a_{ij}^k$`(上标k的意思是说这是第k个filter，i,j代表在这个matrix里面的第i row和第j column)。
 
-假设input一张image，我们称之为X，那我们现在要解的问题就是：找一个x，它可以让我们现在定义的activation Degree `$a^k$`最大，这件事情要咋样做到呢？其实是用gradient ascent你就可以做到这件事(minimize使用gradient descent，maximize使用gradient ascent)
+接下来我们定义一个东西叫做："Degree of the activation of the k-th filter"，我们定义一个值代表说：现在第k个filter有多被activate，它有多被启动(现在的input的东西跟第k个activate有多相近，有多match)，第k个filter被启动的Degree定义成：这个11*11的 matrix里面全部的 element的summation。(input一张image，然后看这个filter output的这个11 *11的值全部加起来，当做是这个filter被activate的程度)
 
-这是事还是蛮神妙的，我们现在是把X当做我们要找的参数用gradient ascent做update，原来在train CNN network neuron的时候，input是固定的，model的参数是你需要用gradient descent找出来的，用gradient descent找参数可以让loss被 minimize。但是现在立场是反过来的，现在在这个task里面，model的参数是固定的，我们要让gradient descent 去update这个X，可以让这个activation function的Degree of the activation是最大的。
+
+接下来我们要做的事情是这样子的：我们想知道第k个filter的作用是什么，所以我们想要找一张image，这张image它可以让第k个filter被activate的程度最大。
+
+假设input一张image，我们称之为X，那我们现在要解的问题就是：找一个x，它可以让我们现在定义的activation Degree `$a^k$`最大，这件事情要怎么做到呢？其实是用gradient ascent你就可以做到这件事(minimize使用gradient descent，maximize使用gradient ascent)
+
+还是蛮神妙的，我们现在是把X当做我们要找的参数用gradient ascent做update，原来在train CNN network neuron的时候，input是固定的，model的参数是你需要用gradient descent找出来的，用gradient descent找一组参数可以让loss被 minimize。但是现在立场是反过来的，现在在这个task里面，model的参数是固定的，我们要用gradient descent 去update这个X，可以让这个activation function的Degree of the activation是最大的。
 
 
 
@@ -222,11 +221,11 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-27.png)
 
-这个是得到的结果，如果我们随便取12个filter出来，每一个filter都去找一张image，这个image可以让那个filter的activation最大。现在有50个filter，你就要去找50张image，它可以让这些filter的activation最大。我就随便取了前12个filter，可以让它最active的image出来(如图)。
+这个是得到的结果，如果我们随便取12个filter出来，每一个filter都去找一张image，这个image可以让那个filter的activation最大。现在有50个filter，你就要去找50张image，它可以让这些filter的activation最大。我就随便取了前12个filter，可以让它最activate的image出来(如图)。
 
-这些image有一个共同的特征就是：某种纹路在图上不断的反复。比如说第三张image，上面是有小小的斜条纹，意味着第三个filter的工作就是detain图上有没有斜的条纹。那不要忘了每一个filter考虑的范围都只是图上一个小小的范围。所以今天一个图上如果出现小小的斜的条纹的话，这个filter就会被active，这个output的值就会比较大。那今天如果让图上所有的范围通通都出现这个小小的斜条纹的话，那这个时候它的Degree activation会是最大的。(因为它的工作就是侦测有没有斜的条纹，所以你给它一个完整的数字的时候，它不会最兴奋。你给它都是斜的条纹的时候，它是最兴奋的)
+这些image有一个共同的特征就是：某种纹路在图上不断的反复。比如说第三张image，上面是有小小的斜条纹，意味着第三个filter的工作就是detect图上有没有斜的条纹。那不要忘了每一个filter考虑的范围都只是图上一个小小的范围。所以今天一个图上如果出现小小的斜的条纹的话，这个filter就会被activate，这个output的值就会比较大。那今天如果让图上所有的范围通通都出现这个小小的斜条纹的话，那这个时候它的Degree activation会是最大的。(因为它的工作就是侦测有没有斜的条纹，所以你给它一个完整的数字的时候，它不会最兴奋。你给它都是斜的条纹的时候，它是最兴奋的)
 
-所以你就会发现：每一个filter的工作就是detain某一张pattern。比如说：第三图detain斜的线条，第四图是detain短的直线条，等等。每一个filter所做的事情就是detain不同角度的线条，如果今天input有不同角度的线条，你就会让某一个activation function，某一个filter的output值最大
+所以你就会发现：每一个filter的工作就是detect某一种pattern，detect某一种线条。比如说：第三图detect斜的线条，第四图是detect短的直线条，等等。每一个filter所做的事情就是detect不同角度的线条，如果今天input有不同角度的线条，你就会让某一个activation function，某一个filter的output值最大
 
 
 ### 分析全连接层
@@ -235,26 +234,25 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 在做完convolution和Max Pooling以后，要做一件事情叫做flatten，把flatten的结果丢到neuron network里面去。那我们想要知道：在这个neuron network里面，每一个neuron的工作是什么。
 
-我们要做的事情是这样的：定义第j个neuron，它的output叫做`$a_j$`。接下来我们要做事情就是：找一张image(用gradient ascent的方法找一张X)，这个image X你把它丢到neuron network里面去，它可以让`$a_j$`的值被maximize。找到的结果就是这样的(如图)
+我们要做的事情是这样的：定义第j个neuron，它的output叫做`$a_j$`。接下来我们要做事情就是：找一张image(用gradient ascent的方法找一张image X)，这个image X你把它丢到neuron network里面去，它可以让`$a_j$`的值被maximize。找到的结果就是这样的(如图)
 
-如图是随便取前9个neuron出来，什么样的图丢到CNN里面可以让这9个neuron最被active output的值最大，就是这9张图(如图)
-
-
+如图是随便取前9个neuron出来，什么样的图丢到CNN里面可以让这9个neuron最被activate output的值最大，就是这9张图(如图)
 
 
-这些图跟刚才所观察到图不太一样，在刚在的filter观察到的是类似纹路的图案，在整张图上反复这样的纹路，那是因为每个filter考虑是图上一个小小的range(图上一部分range)。现在每一个neuron，在你做flatten以后，每个neuron的工作就是去看整张图，而不是是去看图的一小部分。
+
+
+这些图跟刚才所观察到图不太一样，在刚在的filter观察到的是类似纹路的图案，在整张图上反复的这样的纹路，那是因为每个filter考虑是图上一个小小的region(图上一部分region)。所以，它detect某一种texture，但是，现在每一个neuron，在你做flatten以后，每个neuron的工作就是去看整张图，而不是是去看图的一小部分。所以，每一个neuron，你可以让它最activate的图，并不再是texture那个样子，而是一个完整的图形，虽然它看起来完全不像是数字。
 
 
 ![](res/chapter21-29.png)
 
-那今天我们考虑是output呢？(output就是10维，每一维对应一个digit)我们把某一维拿出来，找一张image让那个维度output最大。那我们会得到咋样的image呢？你可以想象说：每一个output，每一个dimension对应到某一个数字。
+那今天我们考虑是output呢？(output就是10维，每一维对应一个digit)我们把某一维拿出来，找一张image让那个维度output最大。那我们会得到什么样的image呢？你可以想象说：每一个output，每一个dimension对应到某一个数字。
 
-现在我们找一张image，它可以让对应在数字1的output 最大，那么那张image显然就像看起来是数字1。你可以期待说：我们可以用这个方法让machine自动画出数字。
+按我们现在如果把对应到数字1的那张图，如果现在我们找一张image，它可以让对应在数字1的output layer的neuron 它的output 最大，那么那张image显然就像看起来是数字1。你可以期待说：我们可以用这个方法让machine自动画出数字。
 
-但是实际上我们得到的结果是这样子的，每一张图分别代表数字0-9。也就是说：我们到output layer对应到0那个neuron，其实是这样的(如图)，以此类推。你可能会有疑惑，为什么是这样子的，是不是程序有bug。为了确定程序没有bug，再做了一个实验是：我把每张image(如图)都丢到CNN里面，然后看它classifier的结果是什么。CNN确定就说：这个是1，这个是，...，这个是8。CNN就觉得说：你若拿这张image train出来正确率有98的话，就说：这个就是8。所以就很神奇
+但是实际上我们得到的结果是这样子的，每一张图分别代表数字0-9。也就是说：我们找到output layer对应到0那个neuron，它的output最大的image，其实是这样的(如上图)，以此类推。你可能会有疑惑，为什么是这样子的，是不是程序有bug。为了确定程序没有bug，再做了一个实验是：我把每张image(如上图)都丢到CNN里面，然后看它classifier的结果是什么。CNN确定就说：这个是1，这个是，...，这个是8。CNN就觉得说：你若拿这张image train出来正确率有98%的话，就说：这个就是8。所以就很神奇
 
 这个结果在很多的地方有已经被观察到了，今天的这个neuron network它所学到东西跟我们人类是不太一样的(它所学到的东西跟我们人类想象和认知不一样的)。你可以查看这个链接的paper(如图)
-
 
 [相关的paper](https://www.youtube.com/watch?v=M2IebCN9H)
 
@@ -263,20 +261,19 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-30.png)
 
-我们有没有办法让这个图看起来更像数字呢？想法是这样的：一张图是不是数字我们有一些基本的假设，比如说：这些就算你不知道它是什么数字(显然它不是digit)，人类手写出来的就不是这个样子。所以我们应该对x做constraint，我们告诉machine，有些x可能会使y很大但不是数字。我们根据人的power-knowledge就知道，这些x不可能是一些数字。那么我们可以加上咋样的constraint呢？(图中白色的亮点代表的是有墨水的，对一个digit来说，图白的部分其实是有限的，对于一个数字来说，一整张图的某一个小部分会有笔画，所以我们应该对这个x做一些限制)
+我们有没有办法让这个图看起来更像数字呢？想法是这样的：一张图是不是数字我们有一些基本的假设，比如说：这些东西就算你不知道它是什么数字(显然它不是digit)，人类手写出来的就不是这个样子。所以我们应该对x做一些Regularization，做一些constraint，我们告诉machine说，有些x可能会使y很大但不是数字。我们根据人的proir-knowledge就知道，这些x不可能是一个数字。那么我们可以加上怎么的constraint呢？(图中白色的亮点代表的是有墨水的，对一个digit来说，图白的部分其实是有限的，对于一个数字来说，一整张图的某一个小部分会有笔画，所以我们应该对这个x做一些限制)
 
-假设image里面的每一个pixel用`$x_{ij}$`来表示，(每一个image有28 *28的pixel)我们把所有image上`$i,j$`的值取绝对值后加起来。如果你熟悉machine learning的话，这一项就是L1-regularization。然后我们希望说：在找一个x可以让`$y^i$`最大的同时让`$|x_{ij}|$`的summation越小越好。也就是我们希望找出的image，大部分的地方是没有涂颜色的，只有非常少的部分是有涂颜色的。如果我们加上constraint以后我们得到的结果是这样的(如右图所示)，跟左边的图比起来，隐约可以看出来它是一个数字(得到的结果看起来像数字)
+假设image里面的每一个pixel用`$x_{ij}$`来表示，(每一个image有28 *28的pixel)我们把所有image上`$i,j$`的值取绝对值后加起来。如果你熟悉machine learning的话，这一项就是L1-regularization。然后我们希望说：在找一个x可以让`$y^i$`最大的同时，让`$|x_{ij}|$`的summation越小越好。也就是我们希望找出的image，大部分的地方是没有涂颜色的，只有非常少的部分是有涂颜色的。如果我们加上constraint以后我们得到的结果是这样的(如右图所示)，跟左边的图比起来，隐约可以看出来它是一个数字(得到的结果看起来像数字)
 
-你可能会有一个问题，绝对值咋样去微分，下堂课会讲到
+你可能会有一个问题，绝对值怎么去微分，下堂课会讲到
 
-你如果加上一些额外的constraint，比如说：你希望相邻的pixel
-是同样的颜色等等，你应该可以得到更好的结果。不过其实有更多很好的方法可以让machine generate数字
+你如果加上一些额外的constraint，比如说：你希望相邻的pixel是同样的颜色等等，你应该可以得到更好的结果。不过其实有更多很好的方法可以让machine generate数字
 
 ## Deep Dream
 
 ![](res/chapter21-31.png)
 
-其实上述的想法就是Deep Dream的精神，Deep Dream是说：如果你给machine一张image，它会在这张image里加上它看到的东西。咋样做这件事情呢？你先找一张image，然后将这张image丢到CNN中，把它的某一个hidden layer拿出来(vector)，它是一个vector(假设这里是：[3.9, -1.5, 2.3...])。接下来把postitive dimension值调大，把negative dimension值调小(正的变的更正，负的变得更负)。你把这个(调节之后的vector)当做是新的image的目标(把3.9的值变大，把-1.5的值变得更负，2.3的值变得更大。然后找一张image(modify image)用GD方法，让它在hidden layer output是你设下的target)。这样做的话就是让CNN夸大化它所看到的东西，本来它已经看到某一个东西了，你让它看起来更像它原来看到的东西。本来看起来是有一点像东西，它让某一个filter有被active，但是你让它被active的更剧烈(夸大化看到的东西)。
+其实上述的想法就是Deep Dream的精神，Deep Dream是说：如果你给machine一张image，它会在这张image里加上它看到的东西。怎么做这件事情呢？你先找一张image，然后将这张image丢到CNN中，把它的某一个hidden layer拿出来(vector)，它是一个vector(假设这里是：[3.9, -1.5, 2.3...])。接下来把postitive dimension值调大，把negative dimension值调小(正的变的更正，负的变得更负)。你把这个(调节之后的vector)当做是新的image的目标(把3.9的值变大，把-1.5的值变得更负，2.3的值变得更大。然后找一张image(modify image)用GD方法，让它在hidden layer output是你设下的target)。这样做的话就是让CNN夸大化它所看到的东西，本来它已经看到某一个东西了，你让它看起来更像它原来看到的东西。本来看起来是有一点像东西，它让某一个filter有被activate，但是你让它被activate的更剧烈(夸大化看到的东西)。
 
 
 
@@ -291,7 +288,7 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-33.png)
 
-今天input一张image，input一张image，让machine去修改这张图，让它有另外一张图的风格 (类似于风格迁移)
+今天input一张image，让machine去修改这张图，让它有另外一张图的风格 (类似于风格迁移)
 
 ![](res/chapter21-34.png)
 
@@ -302,10 +299,9 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 [这里给一个reference给参考](https://arxiv.org/abs/158.06576)
 
-其中做法的精神是这样的：原来的image丢给CNN，然后得到CNN的filter的output，CNN的filter的output代表这张image有什么content。接下来你把呐喊这张图也丢到CNN里面，也得到filter的output。我们并不在意一个filter ，而是在意filter和filter之间
-的convolution，这个convolution代表了这张image的style。
+其中做法的精神是这样的：原来的image丢给CNN，然后得到CNN的filter的output，CNN的filter的output代表这张image有什么content。接下来你把呐喊这张图也丢到CNN里面，也得到filter的output。但是这个时候我们考虑的不是filter output的absolute的value，我们并不在意一个filter output的value是什么，而是在意filter和filter之间output的的correlation，这个correlation代表了这张image的style。
 
-接下来你用同一个CNN找一张image，这张image它的content像左边这张相片，但同时这张image的style像右边这张相片。你找一张image同时可以maximize左边的图，也可以maximize右边的图。那你得到的结果就是像最底下的这张图。用的就是刚才讲的gradient ascent的方法找一张image，然后maximize这两张图，得到就是底下的这张图。
+接下来你用同一个CNN找一张image，这张image它的content像左边这张相片，比如说，这张image它的filter output的value像左边这张相片。但同时这张image的style像右边这张相片。所谓的style像右边这张相片是，你这个image output的filter间的correlation像右边这张相片，你找一张image同时可以maximize左边的图，也可以maximize右边的图。那你得到的结果就是像最底下的这张图。用的就是刚才讲的gradient ascent的方法找一张image，然后maximize这两个criteria的结果，得到就是左边这个图。
 
 
 ## CNN的应用
@@ -313,12 +309,11 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 ### 围棋
 ![](res/chapter21-36.png)
 
-我们现在CNN已经在很多不同的应用上，而不是只有影像处理上。比如：CNN现在有一个很知名的应用，就用用在下围棋上面。为什么CNN可以用来下围棋上面呢？
+我们现在CNN已经在很多不同的应用上，而不是只有影像处理上。比如：CNN现在有一个很知名的应用，就是用在下围棋上面。为什么CNN可以用来下围棋上面呢？
 
-我们知道如果让machine来下围棋，你不见得需要用CNN。其实一般的topic neuron network也可以帮我们做到这件事情。你只要learn一个network(也就是找一个function)，它的input是棋盘，output是棋盘上的位置。也就是说：你根据这个棋盘的盘式，如果你下一步要落子的话，你落子的位置其实就可以让machine学会。
+我们知道如果让machine来下围棋，你不见得需要用CNN。其实一般的typical的 neuron network也可以帮我们做到这件事情。你只要learn一个network(也就是找一个function)，它的input是棋盘，output是棋盘上的位置。也就是说：你根据这个棋盘的盘式，如果你下一步要落子的话，你落子的位置其实就可以让machine学会。
 
-所以你用Fully-connected feedforward network也可以帮我们做到让machine下围棋这件事情。也就是你只要告诉input是一个19 *19的vector，每一个vector的dimension对应到棋盘上面的每一个位置。machine就可以学会下围棋了。
-如果那个位置有一个黑子的话就是1，如果有一个白子的话就是-1，反之就是0。
+所以你用Fully-connected feedforward network也可以帮我们做到让machine下围棋这件事情。也就是你只要告诉input是一个19 *19的vector，每一个vector的dimension对应到棋盘上面的每一个位置。machine就可以学会下围棋了。如果那个位置有一个黑子的话就是1，如果有一个白子的话就是-1，反之就是0。如果你把棋盘描述成一个19x19的vector，丢到一个fully connnected的feedforward network，output也是19x19个dimensions，每一个dimensions对应棋盘上的一个位置，那machine就可以学会下围棋了。
 
 
 但是我们这边采用CNN的话，我们会得到更好的performance。我们之前举的例子是把CNN用在影像上面，也就是input是matrix(也就是把19*19的vector表示成19 *19的matrix)，然后当做一个image来看，然后让它output 下一步落子的位置就结束了。
@@ -330,17 +325,17 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 ![](res/chapter21-38.png)
 
-现在大家都说“AlphaGo”，都是懂懂的样子。但是自从“AlphaGo”用了CNN以后，大家都觉得说：CNN应该很厉害。所以如果你没有用CNN来处理你的问题，别人就会问你为什么不用CNN来处理问题(比如说：面试的时候)，CNN不是比较强吗
+现在大家都说“AlphaGo”，都是懂懂懂的样子。但是自从“AlphaGo”用了CNN以后，大家都觉得说：CNN应该很厉害。所以如果你没有用CNN来处理你的问题，别人就会问你为什么不用CNN来处理问题(比如说：面试的时候)，CNN不是比较强吗？
 
 
-什么时候应该用CNN呢？image必须有该有的那些特性，在CNN开头就有说：根据那三个观察，所以设计出了CNN这样的架构。在处理image时是特别有效的。为什么这样的架构也同样可以用在围棋上面(因为围棋有一些特性跟影像处理是非常相似的)
+什么时候应该用CNN呢？image必须有该有的那些特性，在CNN开头就有说：根据那三个观察，所以设计出了CNN这样的network架构。在处理image时是特别有效的。为什么这样的架构也同样可以用在围棋上面(因为围棋有一些特性跟影像处理是非常相似的)
 
 第一个是：在image上面，有一些pattern是要比整张image还要小的多的(比如：鸟喙是要比整张的image要小的多)，只需要看那一小的部分就知道那是不是鸟喙。在围棋上也有同样的现象，如图所示，一个白子被三个黑子围住(这就是一个pattern)，你现在只需要看这一小小的范围，就可以知道白子是不是没“气”了，不需要看整个棋盘才能够知道这件事情，这跟image是有同样的性质。
 
 
-在“AlphaGo”里面它的第一个layer filter其实就是用5*5的filter，显然做这个设计的人觉得说：围棋最基本的pattern可能都是在5 *5的范围内就可以被侦测出来，不需要看整个棋牌才能知道这件事情。
+在“AlphaGo”里面它的第一个layer的 filter其实就是用5*5的filter，显然做这个设计的人觉得说：围棋最基本的pattern可能都是在5 *5的范围内就可以被侦测出来，不需要看整个棋牌才能知道这件事情。
 
-接下来我们说image还有一个特性：同样的pattern会出现在不同的regions，而他们代表的是同样的意义，在围棋上可能也会有同样的现象。像如图这个pattern可以出现在左上角，也可以出现在右下角，它们都代表了同样的意义。所以你可以用同一个pattern来处理在不同位置的同样的pattern。所以对围棋来说，是有这两个特性的。
+接下来我们说image还有一个特性：同样的pattern会出现在不同的regions，而他们代表的是同样的意义，在围棋上可能也会有同样的现象。像如图这个pattern(叫吃)可以出现在左上角，也可以出现在右下角，它们都代表了同样的意义。所以你可以用同一个detector来处理在不同位置的同样的pattern。所以对围棋来说，是有这两个特性的。
 
 
 ### AlphaGo
@@ -354,11 +349,11 @@ flatten就是feature map拉直，拉直之后就可以丢到fully connected feed
 
 有一天我突然领悟到“AlphaGo”的CNN架构里面有什么特别的地方(“AlphaGo”Paper的附录)，在“AlphaGo”Paper里面只说了一句：用CNN架构，但它没有在正文里仔细描述CNN的架构，会不会实际上CNN架构里有什么特别的玄机呢？
 
-在“AlphaGo”Paper的附录里面，描述了neuron network structure，它的input是一个19 *19 *48的image。19 *1是可以理解，因为棋盘就是19 *19。48是咋样来的呢？对于“AlphaGo”来说，它把每一个位置都用48个value来描述。这里面的value包括：我们只要在一个位置来描述有没有白子，有没有黑子；还加上了domain-knowledge(不只是说：有没有黑子或者白子，还会看这个位置是不是出于没“气”的状态，等等)
+在“AlphaGo”Paper的附录里面，描述了neuron network structure，它的input是一个19 *19 *48的image。19 *19是可以理解，因为棋盘就是19 *19。48是怎么来的呢？对于“AlphaGo”来说，它把每一个位置都用48个value来描述。这里面的value包括：我们不是只要在一个位置来描述有没有白子，有没有黑子；还加上了domain-knowledge(不只是说：有没有黑子或者白子，还会看这个位置是不是出于没“气”的状态，等等)
 
 如果读完这段你会发现：第一个layer有做 zero pads。也就是说：把原来19*19的image外围补上更多的0，让它变成23 *23的image。
 
-第一个hidden layer用的是5*5 filter(总共有k个filter)，k的值在Paper中用的是192(k=192)；stride设为1；使用RLU activation function等等。
+第一个hidden layer用的是5*5 filter(总共有k个filter)，k的值在Paper中用的是192(k=192)；stride设为1；使用ReLU activation function等等。
 
 然后你就会发现“AlphaGo”是没有用Max Pooling，所以这个neuron network的架构设计就是“运用之妙，存乎一心”。虽然在image里面我们都会用Max Pooling这个架构，但是针对围棋的特性来设计neuron network的时候，我们是不需要Max Pooling这个架构的，所以在“AlphaGo”里面没有这个架构.
 
@@ -375,11 +370,11 @@ CNN也可以用在其它的task里面，比如说：CNN也用在影像处理上�
 
 这张image其实是我说“你好”，然后看到的Spectrogram。有通过训练的人，看这张image，就知道这句话的内容是什么。
 
-人既然可以看这个image就可以知道是什么样的声音讯号，那我们也可以让机器把这个Spectrogram当做一张image。然后用CNN来判断：input一张image，它是对应什么样的声音讯号(单位可能是phone)。但是神奇的地方是：CNN里面的时候，在语音上，我们通常只考虑在frequency方向上移动的filter。也就是说：我们的filter是长方形的，其中宽是跟image的宽是一样的，我们在移动filter的时候，我们移这个方向(如图所示)
+人既然可以看这个image就可以知道是什么样的声音讯号，那我们也可以让机器把这个Spectrogram当做一张image。然后用CNN来判断：input一张image，它是对应什么样的声音讯号(单位可能是phone)。但是神奇的地方是：当我们把一段spectrogram当做image，丢到CNN里面的时候，在语音上，我们通常只考虑在frequency方向上移动的filter。也就是说：我们的filter是长方形的，其中宽是跟image的宽是一样的，我们在移动filter的时候，我们移这个方向(如图所示)
 
 如果把filter向时间的方向移动的话，结果是没有太大的帮助。这样的原因是：在语音里面，CNN的output还会接其他的东西(比如:LSTM)，所以在向时间方向移动是没有太多的帮助。
 
-为什么在频率上的filter会有帮助呢？我们用filter的目的是：为了detain同样的pattern出现在不同的range，我们都可以用同一个的filter detain出来。那在声音讯号上面，男生跟女生发同样的声音(同样说“你好”)，Spectrogram看起来是非常不一样的，它们的不同可能只是频率的区别而已(男生的“你好”跟女生的“你好”，它们的pattern其实是一样的)
+为什么在频率上的filter会有帮助呢？我们用filter的目的是：为了detect同样的pattern出现在不同的region，我们都可以用同一个的filter detect出来。那在声音讯号上面，男生跟女生发同样的声音(同样说“你好”)，Spectrogram看起来是非常不一样的，它们的不同可能只是频率的区别而已(男生的“你好”跟女生的“你好”，它们的pattern其实是一样的)
 
 
 所以今天我们把filter在frequency direction移动是有效的。当我们把CNN用在application时，你永远要想一想，这个application的特性是什么，根据那个application的特性来design network的structure
